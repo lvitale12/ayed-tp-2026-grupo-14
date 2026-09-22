@@ -17,6 +17,7 @@ cómo resolverlo con lo que vimos de archivos.
 
 ## Organización del grupo
 
+- [Guía general: qué hay que construir y cómo funciona](docs/GUIA_TP.md)
 - [Plan de trabajo y reparto](docs/PLAN_DE_TRABAJO.md)
 - [Contrato común entre los cuatro programas](docs/CONTRATO_COMUN.md)
 - [Flujo de ramas, PR y commits](docs/FLUJO_GIT.md)
