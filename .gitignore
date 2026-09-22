@@ -1,5 +1,7 @@
 *.exe
 *.out
+*.o
+*.obj
 /normalizacion
 /ventas
 /cierre
@@ -7,3 +9,5 @@
 build/
 /*.dat
 .claude/
+.vscode/
+.idea/

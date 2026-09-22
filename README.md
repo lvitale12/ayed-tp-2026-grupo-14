@@ -3,12 +3,24 @@
 Trabajo Práctico grupal de **Algoritmos y Estructuras de Datos** (UTN FRBA) —
 unidad de **archivos binarios en C/C++**.
 
-> **Grupo:** _(completar: número de grupo)_
-> **Integrantes:** _(nombre — usuario de GitHub, uno por línea)_
+> **Grupo:** 14
+>
+> **Integrantes:**
+> - Lorenzo Vitale — [@lvitale12](https://github.com/lvitale12)
+> - Mateo Agustin Gongora — usuario de GitHub pendiente
+> - Tomas Genovesi — usuario de GitHub pendiente
+> - Guadalupe Erli — usuario de GitHub pendiente
 
 La consigna completa está en **`enunciado.pdf`**. Leela antes de arrancar: el
 cliente (Alberto) cuenta su problema a su manera y ustedes tienen que descubrir
 cómo resolverlo con lo que vimos de archivos.
+
+## Organización del grupo
+
+- [Plan de trabajo y reparto](docs/PLAN_DE_TRABAJO.md)
+- [Contrato común entre los cuatro programas](docs/CONTRATO_COMUN.md)
+- [Flujo de ramas, PR y commits](docs/FLUJO_GIT.md)
+- [Plan de pruebas](docs/PRUEBAS.md)
 
 ## Estructura del repo
 
