@@ -6,10 +6,12 @@ unidad de **archivos binarios en C/C++**.
 > **Grupo:** 14
 >
 > **Integrantes:**
-> - Lorenzo Vitale — [@lvitale12](https://github.com/lvitale12)
+> - [@lvitale12](https://github.com/lvitale12)
 > - Mateo Agustin Gongora — usuario de GitHub pendiente
 > - Tomas Genovesi — usuario de GitHub pendiente
 > - Guadalupe Erli — usuario de GitHub pendiente
+>
+> Los nombres completos y usuarios faltantes se revisarán antes de la entrega.
 
 La consigna completa está en **`enunciado.pdf`**. Leela antes de arrancar: el
 cliente (Alberto) cuenta su problema a su manera y ustedes tienen que descubrir

@@ -2,18 +2,20 @@
 
 Moodle muestra vencimiento el **30/09/2026 a las 00:00**. Para no depender de una interpretación ambigua, el límite interno del grupo será el **29/09 a las 12:00** y el envío se hará durante ese día.
 
-## Dificultad y reparto propuesto
+## Dificultad y criterio de reparto
 
 El problema no exige C++ avanzado. La dificultad está en mantener compatibles los archivos binarios y conseguir que funcionen los cuatro programas en cadena.
 
-| Programa | Dificultad aproximada | Responsable propuesto |
+| Programa | Dificultad aproximada | Estado |
 | --- | ---: | --- |
-| `normalizacion.cpp` | 8/10 | integrante con mayor soltura, con apoyo de quien haga cierre |
-| `ventas.cpp` | 7/10 | segundo integrante con mayor soltura |
-| `cierre.cpp` | 6/10 | un integrante, más apoyo acotado a normalización |
-| `resumen.cpp` | 4/10 | Lorenzo |
+| `normalizacion.cpp` | 8/10 | sin asignar |
+| `ventas.cpp` | 7/10 | sin asignar |
+| `cierre.cpp` | 6/10 | sin asignar |
+| `resumen.cpp` | 4/10 | sin asignar |
 
-Lorenzo también coordina el repositorio, integración, README y entrega. El reparto definitivo se cierra cuando todos indiquen experiencia, disponibilidad y preferencia.
+Todavía no hay programas asignados. El reparto se cierra cuando todos indiquen experiencia, disponibilidad y preferencia. Para llegar a tiempo, se priorizará cubrir primero las tareas críticas y cada integrante tomará la parte que más ayude al avance general.
+
+`normalizacion.cpp` y `ventas.cpp` tienen mayor carga. Quienes tomen `cierre.cpp` o `resumen.cpp` también deberán colaborar con pruebas, integración o una tarea acotada de los programas más grandes.
 
 Cada integrante será responsable principal de un programa, pero deberá revisar al menos un PR ajeno y poder explicar la cadena completa en la defensa.
 

@@ -13,6 +13,12 @@ La cátedra evalúa el historial. El objetivo es mostrar trabajo real, no fabric
 7. No se comparten cuentas, no se cambian autores y no se crean commits vacíos.
 8. `Co-authored-by` se usa únicamente cuando hubo trabajo en pareja real.
 
+## Uso de herramientas de asistencia
+
+Se pueden utilizar herramientas de IA o asistencia para acelerar diseño, implementación, depuración y pruebas, siempre que la política de la cátedra lo permita. No es necesario que cada carácter se escriba manualmente.
+
+La responsabilidad del commit sigue siendo de quien lo publica: debe revisar el cambio, compilarlo, probarlo y poder explicar las decisiones y el algoritmo durante la defensa. No se atribuye código a otra cuenta ni se divide artificialmente para aparentar trabajo.
+
 ## Qué constituye un buen commit
 
 Un commit representa un hito que compila o una corrección comprobable. Ejemplos:
