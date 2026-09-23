@@ -47,6 +47,6 @@ Estos valores son oráculos de prueba; nunca deben quedar codificados en la solu
 - Emisión correcta del último mozo en el corte de control.
 - Una operación rechazada no modifica inventario, mozos ni comandas.
 
-## Prueba final
+## Prueba final sugerida
 
-Cada integrante debe clonar el repositorio en una carpeta nueva, copiar los `.dat` oficiales a la raíz, compilar los cuatro programas y ejecutar la cadena completa.
+Como verificación independiente, sería conveniente que una o más personas clonen el repositorio en una carpeta nueva, copien los `.dat` oficiales a la raíz, compilen los cuatro programas y ejecuten la cadena completa.

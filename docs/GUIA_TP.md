@@ -185,6 +185,6 @@ El TP está listo cuando:
 
 Los valores esperados y casos límite están en [PRUEBAS.md](PRUEBAS.md).
 
-## Forma de trabajo
+## Organización sugerida
 
-Cada programa tiene un responsable principal, pero todos deben entender la cadena completa. El trabajo se realiza en ramas cortas y se integra mediante pull requests con merge commit, sin squash. Las reglas completas están en [FLUJO_GIT.md](FLUJO_GIT.md) y el calendario en [PLAN_DE_TRABAJO.md](PLAN_DE_TRABAJO.md).
+Una posibilidad es que cada programa tenga una persona de referencia y que el resto colabore en revisiones, pruebas e integración. Si al grupo le resulta útil, pueden trabajar con ramas cortas y pull requests para conservar el historial. Hay más alternativas en [FLUJO_GIT.md](FLUJO_GIT.md) y un calendario orientativo en [PLAN_DE_TRABAJO.md](PLAN_DE_TRABAJO.md).

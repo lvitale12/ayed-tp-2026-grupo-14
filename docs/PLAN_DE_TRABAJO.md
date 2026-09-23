@@ -13,13 +13,15 @@ El problema no exige C++ avanzado. La dificultad está en mantener compatibles l
 | `cierre.cpp` | 6/10 | sin asignar |
 | `resumen.cpp` | 4/10 | sin asignar |
 
-Todavía no hay programas asignados. El reparto se cierra cuando todos indiquen experiencia, disponibilidad y preferencia. Para llegar a tiempo, se priorizará cubrir primero las tareas críticas y cada integrante tomará la parte que más ayude al avance general.
+Todavía no hay programas asignados. El reparto podría definirse cuando todos indiquen experiencia, disponibilidad y preferencia. Para llegar a tiempo, una opción es priorizar las tareas críticas y distribuirse según lo que más ayude al avance general.
 
-`normalizacion.cpp` y `ventas.cpp` tienen mayor carga. Quienes tomen `cierre.cpp` o `resumen.cpp` también deberán colaborar con pruebas, integración o una tarea acotada de los programas más grandes.
+`normalizacion.cpp` y `ventas.cpp` tienen mayor carga. Para equilibrar, quienes tomen `cierre.cpp` o `resumen.cpp` podrían ayudar además con pruebas, integración o una tarea acotada de los programas más grandes.
 
-Cada integrante será responsable principal de un programa, pero deberá revisar al menos un PR ajeno y poder explicar la cadena completa en la defensa.
+Una distribución posible es tener una persona de referencia por programa y hacer algunas revisiones cruzadas, procurando que todos conozcan la cadena completa para la defensa.
 
-## Calendario
+## Calendario orientativo
+
+Las siguientes fechas son una propuesta para visualizar el tiempo disponible. El grupo puede adaptarlas según su disponibilidad.
 
 ### 22/09 — Preparación
 
@@ -27,7 +29,7 @@ Cada integrante será responsable principal de un programa, pero deberá revisar
 - Leer el enunciado completo.
 - Congelar el contrato común.
 - Asignar programas y abrir una rama por tarea.
-- Cada integrante crea un esqueleto compilable y realiza su primer commit propio.
+- Si resulta útil, cada integrante puede crear un esqueleto compilable y registrar un primer avance propio.
 
 ### 23–25/09 — Desarrollo individual
 
@@ -55,7 +57,7 @@ Corregir incompatibilidades sin cambiar unilateralmente structs, nombres de arch
 - Cubrir todos los casos de `docs/PRUEBAS.md`.
 - Probar desde un clon limpio.
 - Completar README y decisiones.
-- Cada integrante explica su parte y una parte ajena.
+- Puede ser útil que cada integrante practique la explicación de su parte y conozca al menos otra.
 
 ### 29/09 — Cierre
 

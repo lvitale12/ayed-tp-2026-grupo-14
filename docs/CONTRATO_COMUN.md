@@ -59,4 +59,4 @@ Controles obligatorios:
 - Si `ventas.cpp` también actualiza `Mozo.totalComision`.
 - Qué se hace ante cantidades cero, negativas o superiores al stock.
 
-Nadie debe cambiar estas decisiones en su rama sin comunicarlo al resto.
+Para evitar incompatibilidades, conviene comunicar al resto cualquier cambio en estas decisiones antes de integrarlo.
