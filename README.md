@@ -8,7 +8,7 @@ unidad de **archivos binarios en C/C++**.
 > **Integrantes:**
 > - [@lvitale12](https://github.com/lvitale12)
 > - Mateo Agustin Gongora — usuario de GitHub pendiente
-> - Tomas Genovesi — usuario de GitHub pendiente
+> - [@TomasGenovesi](https://github.com/TomasGenovesi)
 > - Guadalupe Erli — usuario de GitHub pendiente
 >
 > Los nombres completos y usuarios faltantes se revisarán antes de la entrega.
