@@ -9,7 +9,7 @@ unidad de **archivos binarios en C/C++**.
 > - [@lvitale12](https://github.com/lvitale12)
 > - Mateo Agustin Gongora — usuario de GitHub pendiente
 > - [@TomasGenovesi](https://github.com/TomasGenovesi)
-> - Guadalupe Erli — usuario de GitHub pendiente
+> - [@lupe-erli](https://github.com/lupe-erli)
 >
 > Los nombres completos y usuarios faltantes se revisarán antes de la entrega.
 
