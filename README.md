@@ -7,7 +7,7 @@ unidad de **archivos binarios en C/C++**.
 >
 > **Integrantes:**
 > - [@lvitale12](https://github.com/lvitale12)
-> - Mateo Agustin Gongora — usuario de GitHub pendiente
+> - [@mateo-gongora](https://github.com/magongora)
 > - [@TomasGenovesi](https://github.com/TomasGenovesi)
 > - [@lupe-erli](https://github.com/lupe-erli)
 >
