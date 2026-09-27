@@ -1,5 +1,5 @@
 #include <iostream>
-#include <stdio.h>  // Requerido por la catedra para fopen, fread, fclose
+#include <stdio.h>  
 #include <string.h>
 
 using namespace std;
@@ -18,7 +18,7 @@ int main() {
     cout << "Ingrese nombre de la planilla semanal (ej: comandas_semana_s1-06.dat): ";
     cin >> nombreArchivo;
 
-    // Regla de la catedra: Archivos con API estandar de C
+    
     FILE* fSemana = fopen(nombreArchivo, "rb");
     if (fSemana == NULL) {
         cout << "Error: No se pudo abrir " << nombreArchivo << "." << endl;
@@ -35,7 +35,7 @@ int main() {
     if (leyo == 0) {
         cout << "Aviso: El archivo " << nombreArchivo << " esta vacio. No hay ventas." << endl;
         fclose(fSemana);
-        return 0; // Termina la ejecución limpiamente
+        return 0; 
     }
 
     cout << "\n===================================================\n";
