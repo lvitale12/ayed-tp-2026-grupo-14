@@ -4,6 +4,8 @@
 
 using namespace std;
 
+const int K = 5;
+
 struct ComandaHistorica {
     char fecha[11];
     char nombreMozo[50];
@@ -26,11 +28,16 @@ struct Mozo {
     float totalComision;
 };
 
-int mostrarComandasHistoricas(const char* nombreArchivo);
-void mostrarInventario(const char* nombreArchivo);
+int contarDigitos(int numero);
+void convertirIdACadena(int idMozo, char cadena[]);
+void aplicarCorrimiento(char clave[]);
+void generarClaveInicial(int idMozo, char clave[]);
+
 int buscarMozo(Mozo mozos[], int cantidadMozos, const char nombre[]);
 int cargarMozos(const char* nombreArchivo, Mozo mozos[]);
 void mostrarMozos(Mozo mozos[], int cantidadMozos);
+int mostrarComandasHistoricas(const char* nombreArchivo);
+void mostrarInventario(const char* nombreArchivo);
 
 int main() {
     int cantidadComandas =
@@ -137,7 +144,10 @@ int cargarMozos(const char* nombreArchivo, Mozo mozos[]) {
         if (posicion == -1) {
             mozos[cantidadMozos].idMozo = cantidadMozos + 1;
             strcpy(mozos[cantidadMozos].nombre, comanda.nombreMozo);
-            mozos[cantidadMozos].password[0] = '\0';
+            generarClaveInicial(
+                mozos[cantidadMozos].idMozo,
+                mozos[cantidadMozos].password
+            );
             mozos[cantidadMozos].totalComision = comanda.comision;
             cantidadMozos++;
         } else {
@@ -157,7 +167,8 @@ void mostrarMozos(Mozo mozos[], int cantidadMozos) {
     for (int i = 0; i < cantidadMozos; i++) {
         cout << mozos[i].idMozo << " | "
              << mozos[i].nombre << " | comision total "
-             << mozos[i].totalComision << endl;
+             << mozos[i].totalComision << " | clave transformada "
+             << mozos[i].password << endl;
 
         comisionTotal += mozos[i].totalComision;
     }
@@ -165,4 +176,44 @@ void mostrarMozos(Mozo mozos[], int cantidadMozos) {
     cout << "Total de mozos: " << cantidadMozos << endl;
     cout << "Comision historica total: "
          << comisionTotal << endl;
+}
+
+int contarDigitos(int numero) {
+    int cantidad = 0;
+
+    while (numero > 0) {
+        numero = numero / 10;
+        cantidad++;
+    }
+
+    return cantidad;
+}
+
+void convertirIdACadena(int idMozo, char cadena[]) {
+    int cantidad = contarDigitos(idMozo);
+    int posicion = cantidad - 1;
+
+    cadena[cantidad] = '\0';
+
+    while (posicion >= 0) {
+        int digito = idMozo % 10;
+        cadena[posicion] = '0' + digito;
+
+        idMozo = idMozo / 10;
+        posicion--;
+    }
+}
+
+void aplicarCorrimiento(char clave[]) {
+    int i = 0;
+
+    while (clave[i] != '\0') {
+        clave[i] = clave[i] + K;
+        i++;
+    }
+}
+
+void generarClaveInicial(int idMozo, char clave[]) {
+    convertirIdACadena(idMozo, clave);
+    aplicarCorrimiento(clave);
 }
