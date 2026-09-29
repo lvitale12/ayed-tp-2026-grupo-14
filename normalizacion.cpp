@@ -35,7 +35,9 @@ void generarClaveInicial(int idMozo, char clave[]);
 
 int buscarMozo(Mozo mozos[], int cantidadMozos, const char nombre[]);
 int cargarMozos(const char* nombreArchivo, Mozo mozos[]);
-void mostrarMozos(Mozo mozos[], int cantidadMozos);
+bool guardarMozos(const char* nombreArchivo,
+                  Mozo mozos[],
+                  int cantidadMozos);
 int mostrarComandasHistoricas(const char* nombreArchivo);
 void mostrarInventario(const char* nombreArchivo);
 
@@ -51,8 +53,10 @@ int main() {
     int cantidadMozos =
         cargarMozos("comandas_historicas.dat", mozos);
 
-    cout << endl;
-    mostrarMozos(mozos, cantidadMozos);
+    if (!guardarMozos("mozos.dat", mozos, cantidadMozos)) {
+        delete[] mozos;
+        return 1;
+    }
 
     delete[] mozos;
 
@@ -159,23 +163,31 @@ int cargarMozos(const char* nombreArchivo, Mozo mozos[]) {
     return cantidadMozos;
 }
 
-void mostrarMozos(Mozo mozos[], int cantidadMozos) {
-    float comisionTotal = 0;
+bool guardarMozos(const char* nombreArchivo,
+                  Mozo mozos[],
+                  int cantidadMozos) {
+    FILE* archivo = fopen(nombreArchivo, "wb");
 
-    cout << "Mozos encontrados:" << endl;
-
-    for (int i = 0; i < cantidadMozos; i++) {
-        cout << mozos[i].idMozo << " | "
-             << mozos[i].nombre << " | comision total "
-             << mozos[i].totalComision << " | clave transformada "
-             << mozos[i].password << endl;
-
-        comisionTotal += mozos[i].totalComision;
+    if (archivo == NULL) {
+        cout << "No se pudo crear " << nombreArchivo << endl;
+        return false;
     }
 
-    cout << "Total de mozos: " << cantidadMozos << endl;
-    cout << "Comision historica total: "
-         << comisionTotal << endl;
+    for (int i = 0; i < cantidadMozos; i++) {
+        int escribio =
+            fwrite(&mozos[i], sizeof(Mozo), 1, archivo);
+
+        if (escribio != 1) {
+            cout << "No se pudo escribir un mozo" << endl;
+            fclose(archivo);
+            return false;
+        }
+    }
+
+    fclose(archivo);
+    cout << "Se genero " << nombreArchivo
+         << " con " << cantidadMozos << " mozos" << endl;
+    return true;
 }
 
 int contarDigitos(int numero) {
