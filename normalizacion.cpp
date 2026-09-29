@@ -28,12 +28,33 @@ struct Mozo {
     float totalComision;
 };
 
+struct Comanda {
+    int idMozo;
+    int codigoProducto;
+    int cantidad;
+    float comision;
+};
+
+// Conserva la fecha mientras las comandas se procesan en memoria.
+struct ComandaConFecha {
+    char fecha[11];
+    Comanda comanda;
+};
+
 int contarDigitos(int numero);
 void convertirIdACadena(int idMozo, char cadena[]);
 void aplicarCorrimiento(char clave[]);
 void generarClaveInicial(int idMozo, char clave[]);
 
 int buscarMozo(Mozo mozos[], int cantidadMozos, const char nombre[]);
+Comanda convertirComanda(ComandaHistorica comandaHistorica, int idMozo);
+int cargarComandasNormalizadas(const char* nombreArchivo,
+                               Mozo mozos[],
+                               int cantidadMozos,
+                               ComandaConFecha comandas[]);
+void ordenarComandas(ComandaConFecha comandas[], int cantidadComandas);
+bool guardarComandasDiarias(ComandaConFecha comandas[],
+                            int cantidadComandas);
 int cargarMozos(const char* nombreArchivo, Mozo mozos[]);
 bool guardarMozos(const char* nombreArchivo,
                   Mozo mozos[],
@@ -58,6 +79,30 @@ int main() {
         return 1;
     }
 
+    ComandaConFecha* comandas =
+        new ComandaConFecha[cantidadComandas];
+    int cantidadNormalizadas = cargarComandasNormalizadas(
+        "comandas_historicas.dat",
+        mozos,
+        cantidadMozos,
+        comandas
+    );
+
+    if (cantidadNormalizadas != cantidadComandas) {
+        delete[] comandas;
+        delete[] mozos;
+        return 1;
+    }
+
+    ordenarComandas(comandas, cantidadNormalizadas);
+
+    if (!guardarComandasDiarias(comandas, cantidadNormalizadas)) {
+        delete[] comandas;
+        delete[] mozos;
+          return 1;
+    }
+
+    delete[] comandas;
     delete[] mozos;
 
     cout << endl;
@@ -69,7 +114,7 @@ int mostrarComandasHistoricas(const char* nombreArchivo) {
     FILE* archivo = fopen(nombreArchivo, "rb");
 
     if (archivo == NULL) {
-        cout << "No se pudo abrir " << nombreArchivo << endl;
+            cout << "No se pudo abrir " << nombreArchivo << endl;
         return 0;
     }
 
@@ -99,7 +144,7 @@ void mostrarInventario(const char* nombreArchivo) {
 
     if (archivo == NULL) {
         cout << "No se pudo abrir " << nombreArchivo << endl;
-        return;
+         return;
     }
 
     Producto producto;
@@ -109,7 +154,7 @@ void mostrarInventario(const char* nombreArchivo) {
         cout << producto.codigo << " | "
              << producto.descripcion << " | precio "
              << producto.precio << " | stock "
-             << producto.stockActual << endl;
+                 << producto.stockActual << endl;
 
         cantidadProductos++;
     }
@@ -122,12 +167,136 @@ void mostrarInventario(const char* nombreArchivo) {
 
 int buscarMozo(Mozo mozos[], int cantidadMozos, const char nombre[]) {
     for (int i = 0; i < cantidadMozos; i++) {
-        if (strcmp(mozos[i].nombre, nombre) == 0) {
+         if (strcmp(mozos[i].nombre, nombre) == 0) {
             return i;
         }
     }
 
     return -1;
+}
+
+Comanda convertirComanda(ComandaHistorica comandaHistorica, int idMozo) {
+    Comanda comandaNormalizada;
+
+    comandaNormalizada.idMozo = idMozo;
+    comandaNormalizada.codigoProducto = comandaHistorica.codigoProducto;
+    comandaNormalizada.cantidad = comandaHistorica.cantidad;
+     comandaNormalizada.comision = comandaHistorica.comision;
+
+    return comandaNormalizada;
+}
+
+int cargarComandasNormalizadas(const char* nombreArchivo,
+                               Mozo mozos[],
+                               int cantidadMozos,
+                               ComandaConFecha comandas[]) {
+    FILE* archivo = fopen(nombreArchivo, "rb");
+
+      if (archivo == NULL) {
+           cout << "No se pudo abrir " << nombreArchivo << endl;
+         return 0;
+    }
+
+    ComandaHistorica comandaHistorica;
+    int cantidadComandas = 0;
+
+    while (fread(&comandaHistorica,
+                 sizeof(ComandaHistorica),
+                 1,
+                 archivo) == 1) {
+        int posicionMozo = buscarMozo(
+             mozos,
+            cantidadMozos,
+            comandaHistorica.nombreMozo
+          );
+
+        if (posicionMozo == -1) {
+             fclose(archivo);
+             return cantidadComandas;
+        }
+
+        strcpy(comandas[cantidadComandas].fecha,
+               comandaHistorica.fecha);
+        comandas[cantidadComandas].comanda = convertirComanda(
+              comandaHistorica,
+            mozos[posicionMozo].idMozo
+        );
+        cantidadComandas++;
+    }
+
+    fclose(archivo);
+    return cantidadComandas;
+}
+
+// Ordena por fecha y, dentro de cada fecha, por id de mozo.
+void ordenarComandas(ComandaConFecha comandas[], int cantidadComandas) {
+    for (int i = 0; i < cantidadComandas - 1; i++) {
+        int posicionMenor = i;
+
+        for (int j = i + 1; j < cantidadComandas; j++) {
+            int comparacionFecha = strcmp(
+                   comandas[j].fecha,
+                comandas[posicionMenor].fecha
+            );
+
+            if (comparacionFecha < 0 ||
+                (comparacionFecha == 0 &&
+                  comandas[j].comanda.idMozo <
+                 comandas[posicionMenor].comanda.idMozo)) {
+                posicionMenor = j;
+            }
+        }
+
+        if (posicionMenor != i) {
+            ComandaConFecha auxiliar = comandas[i];
+            comandas[i] = comandas[posicionMenor];
+            comandas[posicionMenor] = auxiliar;
+        }
+    }
+}
+
+bool guardarComandasDiarias(ComandaConFecha comandas[],
+                            int cantidadComandas) {
+    int posicion = 0;
+
+    while (posicion < cantidadComandas) {
+        char fechaActual[11];
+        strcpy(fechaActual, comandas[posicion].fecha);
+
+        char nombreArchivo[30] = "comandas_";
+        strcat(nombreArchivo, fechaActual);
+        strcat(nombreArchivo, ".dat");
+
+        FILE* archivo = fopen(nombreArchivo, "wb");
+
+        if (archivo == NULL) {
+            cout << "No se pudo crear " << nombreArchivo << endl;
+            return false;
+        }
+
+        while (posicion < cantidadComandas &&
+               strcmp(comandas[posicion].fecha, fechaActual) == 0) {
+            int escribio = fwrite(
+                &comandas[posicion].comanda,
+                sizeof(Comanda),
+                1,
+                archivo
+            );
+
+            if (escribio != 1) {
+                cout << "No se pudo escribir en "
+                     << nombreArchivo << endl;
+                fclose(archivo);
+                return false;
+            }
+
+            posicion++;
+        }
+
+        fclose(archivo);
+    }
+
+    return true;
 }
 
 int cargarMozos(const char* nombreArchivo, Mozo mozos[]) {
