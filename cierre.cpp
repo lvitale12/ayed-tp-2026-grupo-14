@@ -1,4 +1,5 @@
 #include <iostream>
+#include <cstring>
 using namespace std;
 
 //Devuelvo un archivo ordenado por IdMozo con todos los dias de la semana, osea comandas_semana_s1-06.dat
@@ -14,20 +15,32 @@ struct Comanda {
 
 void apareoDosDias (const char* diaA, const char* diaB, const char* aux);
 
-void diasSemana (string idSemana);
+void diasSemana (string idSemana, char matDias[][100], int &cont);
 
-bool existeArchivo (string archivo);
+bool existeArchivo (char archivo[]);
 
-string armarFecha (int dia, int mes, int anio);
+void armarFecha (int dia, int mes, int anio, char fecha[]); // Cambio de string a void por que no puedo devolver un array
 
 int main() {
     
+    char matDias[7][100]; // 7 filas de dia con 100 char cada una
     string idSemana;
+    int cantidadDias = 0;
     cout << "Ingrese el ID semanal: " << endl;
     cin >> idSemana;
 
-    diasSemana(idSemana);
-    //solo estoy retornando el nombre de los archivos no los estoy guardando
+    diasSemana(idSemana, matDias, cantidadDias);
+    
+    if (cantidadDias == 0){
+        cout << "No hay dias cargados en la semana " << idSemana << "." << endl;
+    }
+    else {
+        apareoDosDias(matDias[0], matDias[1], "comandas_semana.dat");
+        for (int i = 2; i < cantidadDias; i++) {
+            apareoDosDias("comandas_semana.dat", matDias[i], "aux.dat");
+            //swap --> aux tiene que ser comandas
+}
+    };
 
     return 0;
 }
@@ -63,8 +76,8 @@ void apareoDosDias (const char* diaA, const char* diaB, const char* diaAux){
 }
 
 //Comprueba si abre o no
-bool existeArchivo (string archivo){
-    FILE* x = fopen (archivo.c_str(), "rb");
+bool existeArchivo (const char* archivo){
+    FILE* x = fopen (archivo, "rb");
     if (x==0){
         return false;
     }
@@ -73,36 +86,34 @@ bool existeArchivo (string archivo){
 }
 
 // Pasa los int de la fecha al formato comandas_DD-MM-AAA.dat
-string armarFecha (int dia, int mes, int anio){
-    string archivoFecha = "comandas_";
+void armarFecha (int dia, int mes, int anio, char fecha[]){
     // calculo decenas y unidades
+
+    strcpy (fecha, "comandas_"); //Copia comandas_ al char fecha desde la pos 0
+   
     char decDia = '0' + (dia/10);
-    archivoFecha+=decDia;
     char unDia = '0' + (dia%10);
-    archivoFecha+=unDia;
-    archivoFecha+="-";
+    char diaCompl[3] = {decDia, unDia, '\0'};
+    strcat (fecha, diaCompl); //Concatena 2 char
 
     char decMes = '0' + (mes/10);
-    archivoFecha+=decMes;
     char unMes = '0' + (mes%10);
-    archivoFecha+=unMes;
-    archivoFecha+="-";
+    char mesCompl[4] = {'-', decMes, unMes, '\0'};
+    strcat (fecha, mesCompl);
+
 
     char milAnio = '0' + (anio/1000);
-    archivoFecha+=milAnio;
     char cenAnio = '0' + ((anio/100)%10);
-    archivoFecha+=cenAnio;
     char decAnio = '0' + ((anio/10)%10);
-    archivoFecha+=decAnio;
     char unAnio = '0' + (anio%10);
-    archivoFecha+=unAnio;
+    char anioCompl[7] = {'-', milAnio, cenAnio, decAnio, unAnio, '.dat', '\0'};
+    strcat (fecha, anioCompl);
 
-    archivoFecha+=".dat";
-    return archivoFecha;
+    return;
 }
 
 //Desglosa el STRING idSemana (formato s(num de semana)_(mes)) para poder obtener los archivos. Empieza en el 1 de cada mes y no se suporponen los meses.
-void diasSemana (string idSemana){
+void diasSemana (string idSemana, char matDias[][100], int &cont){
     int semana = 0;
     int mes = 0;
 
@@ -127,24 +138,32 @@ void diasSemana (string idSemana){
 
     if (semana == 5){  // La semana 5 serian los dias 29-31
         for (int i = 29; i<=31; i++){
-            string fecha = armarFecha(i, mes, anio);
+            char fecha[100];
+            armarFecha(i, mes, anio, fecha);
             if (existeArchivo(fecha)==true){
                 cout << fecha << endl;
+                strcpy (matDias[cont], fecha); // Copio en la fila del cont (Una fila/Suma al contador es un dia), el archivo de fecha obtenido
+                cont++;
             } else {
                 cout << "No hay un archivo del dia " << i << "/" << mes << endl;
             }
         }
+        cout << "La cantidad de días cargados son: " << cont << endl;
     } else {
         int ultDia = (semana*7);
         int primerDia = (ultDia-6);
         for (int i = primerDia; i<=ultDia; i++){
-            string fecha = armarFecha(i, mes, anio);
+           char fecha[100];
+        armarFecha(i, mes, anio, fecha);
             if (existeArchivo(fecha)==true){
                 cout << fecha << endl;
+                strcpy (matDias[cont], fecha); // Copio en la fila del cont (Una fila/Suma al contador es un dia), el archivo de fecha obtenido
+                cont++;
             } else {
                 cout << "No hay un archivo del dia " << i << "/" << mes << endl;
             }
         }
+        cout << "La cantidad de días cargados son: " << cont << endl;
     }
-    // Aca separo por semanas completas de 7 dias, recorro, analizo existencia y devuelvo archivos.
+    // Aca separo por semanas completas de 7 dias, recorro, analizo existencia y devuelvo nombre de archivos y los ordeno en un array.
 }
