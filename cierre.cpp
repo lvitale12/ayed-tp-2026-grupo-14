@@ -15,11 +15,13 @@ struct Comanda {
 
 void apareoDosDias (const char* diaA, const char* diaB, const char* aux);
 
+void moverComanda (const char* aux, const char* comanda);
+
 void diasSemana (string idSemana, char matDias[][100], int &cont);
 
 bool existeArchivo (char archivo[]);
 
-void armarFecha (int dia, int mes, int anio, char fecha[]); // Cambio de string a void por que no puedo devolver un array
+void armarFecha (int dia, int mes, int anio, char fecha[]); 
 
 int main() {
     
@@ -39,6 +41,7 @@ int main() {
         for (int i = 2; i < cantidadDias; i++) {
             apareoDosDias("comandas_semana.dat", matDias[i], "aux.dat");
             //swap --> aux tiene que ser comandas
+            moverComanda ("aux.dat", "comandas_semanas.dat");
 }
     };
 
@@ -73,6 +76,18 @@ void apareoDosDias (const char* diaA, const char* diaB, const char* diaAux){
     fclose(a);
     fclose(b);
     fclose(aux);
+}
+
+//Vacio comandas_semana.dat por que ahora aux es quien tiene el apareo completo (Los que ya estaban apareados mas lo de la pos i)
+void moverComanda (const char* aux, const char* comanda){
+    FILE* a = fopen(aux, "rb");
+    FILE* c = fopen(comanda, "wb"); 
+    Comanda x;
+    while ((fread(&x, sizeof(Comanda), 1, a)==1)){ //Recorrido seguro
+        fwrite(&x, sizeof(Comanda), 1, c);
+    } 
+    fclose(a);
+    fclose(c);
 }
 
 //Comprueba si abre o no
