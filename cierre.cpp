@@ -34,19 +34,22 @@ int main() {
     if (cantidadDias == 0){
         cout << "No hay dias cargados en la semana " << idSemana << "." << endl;
     }
+    else if (cantidadDias==1) {
+         moverComanda(matDias[0], "comandas_semana.dat");
+    }
     else {
         apareoDosDias(matDias[0], matDias[1], "comandas_semana.dat");
         for (int i = 2; i < cantidadDias; i++) {
             apareoDosDias("comandas_semana.dat", matDias[i], "aux.dat");
-            //swap --> aux tiene que ser comandas
             moverComanda ("aux.dat", "comandas_semana.dat");
         }
     };
 
-    char comandaFinal[40];
-    comandaSemanal(idSemana, comandaFinal);
-    moverComanda ("comandas_semana.dat", comandaFinal);
-    cout << "Archivo semanal generado: " << comandaFinal;
+    if (cantidadDias>0){
+        char comandaFinal[40];
+        comandaSemanal(idSemana, comandaFinal);moverComanda ("comandas_semana.dat", comandaFinal); 
+        cout << "Archivo semanal generado: " << comandaFinal << endl;
+    }
 
     return 0;
 }
@@ -55,7 +58,7 @@ void apareoDosDias (const char* diaA, const char* diaB, const char* diaAux){
     FILE* a = fopen(diaA, "rb");
     FILE* b = fopen(diaB, "rb");
     FILE* aux = fopen(diaAux, "wb");
-    Comanda ca, cb; // ca=ComandaA
+    Comanda ca, cb; 
     int la = fread (&ca, sizeof(Comanda), 1, a); 
     int lb = fread (&cb, sizeof(Comanda), 1, b);
     while (la==1 && lb==1){  
@@ -67,7 +70,7 @@ void apareoDosDias (const char* diaA, const char* diaB, const char* diaAux){
             lb = fread(&cb, sizeof(Comanda), 1, b);
         }
     }
-    while (la==1){ //Agoto los archivos
+    while (la==1){ 
         fwrite(&ca, sizeof(Comanda), 1, aux);
         la = fread(&ca, sizeof(Comanda), 1, a);
     }
@@ -84,7 +87,7 @@ void moverComanda (const char* aux, const char* comanda){
     FILE* a = fopen(aux, "rb");
     FILE* c = fopen(comanda, "wb"); 
     Comanda x;
-    while ((fread(&x, sizeof(Comanda), 1, a)==1)){ //Recorrido seguro
+    while ((fread(&x, sizeof(Comanda), 1, a)==1)){ 
         fwrite(&x, sizeof(Comanda), 1, c);
     } 
     fclose(a);
