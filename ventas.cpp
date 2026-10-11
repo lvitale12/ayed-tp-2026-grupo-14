@@ -38,6 +38,7 @@ bool validarMozo(FILE* archivoMozos, int& idMozo);
 bool agregarComanda(const char* nombreArchivo, Comanda comanda);
 bool descontarStock(FILE* archivo, long posicion, Producto producto);
 bool cargarVenta(FILE* archivoMozos, FILE* archivoInventario, const char* nombreArchivo);
+bool ordenarPlanilla(const char* nombreArchivo);
 
 int main() {
     FILE* archivoMozos = fopen("mozos.dat", "rb");
@@ -108,8 +109,10 @@ int main() {
         return 0;
     }
 
-    cout << "Se cargaron " << ventasCargadas << " ventas en "
-         << nombreArchivo << " (todavia sin ordenar)" << endl;
+    if (!ordenarPlanilla(nombreArchivo)) return 1;
+
+    cout << "Se cargaron " << ventasCargadas << " ventas. Planilla "
+         << nombreArchivo << " ordenada por mozo" << endl;
     return 0;
 }
 
@@ -274,5 +277,68 @@ bool cargarVenta(FILE* archivoMozos, FILE* archivoInventario, const char* nombre
     cout << "Venta cargada: " << cantidad << " x " << producto.descripcion
          << " | comision " << comanda.comision
          << " | stock restante " << producto.stockActual << endl;
+    return true;
+}
+
+// Llevo la planilla a memoria, la ordeno por idMozo y la reescribo. Elegi insercion
+// porque es estable (las ventas de un mismo mozo quedan en el orden en que las cargue)
+// y anda bien si el dia ya venia casi ordenado. Escribo primero en un temporal y recien
+// despues reemplazo el original, asi si algo falla no pierdo la planilla.
+bool ordenarPlanilla(const char* nombreArchivo) {
+    const char* temporal = "tmp_planilla.dat";
+    FILE* archivo = fopen(nombreArchivo, "rb");
+
+    if (archivo == NULL) return false;
+
+    fseek(archivo, 0, SEEK_END);
+    long cantidad = ftell(archivo) / sizeof(Comanda);
+    rewind(archivo);
+
+    Comanda* comandas = new Comanda[cantidad];
+    long len = 0;
+
+    while (len < cantidad && fread(&comandas[len], sizeof(Comanda), 1, archivo) == 1) len++;
+    fclose(archivo);
+
+    if (len == 0) {                       // el primer fread ya no pudo leer: planilla vacia
+        cout << nombreArchivo << " esta vacia, no hay nada que ordenar" << endl;
+        delete[] comandas;
+        return true;
+    }
+
+    if (len < cantidad) {                 // si no lei todo, no reescribo para no perder ventas
+        cout << "No se pudo leer completa " << nombreArchivo << endl;
+        delete[] comandas;
+        return false;
+    }
+
+    for (long i = 1; i < len; i++) {
+        Comanda clave = comandas[i];
+        long j = i - 1;
+
+        while (j >= 0 && comandas[j].idMozo > clave.idMozo) {
+            comandas[j + 1] = comandas[j];
+            j--;
+        }
+        comandas[j + 1] = clave;
+    }
+
+    archivo = fopen(temporal, "wb");
+    bool ok = archivo != NULL && (long)fwrite(comandas, sizeof(Comanda), len, archivo) == len;
+    if (archivo != NULL) fclose(archivo);
+    delete[] comandas;
+
+    if (!ok) {
+        remove(temporal);
+        cout << "No se pudo ordenar la planilla" << endl;
+        return false;
+    }
+
+    remove(nombreArchivo);
+    if (rename(temporal, nombreArchivo) != 0) {
+        cout << "No se pudo reemplazar " << nombreArchivo << ". Datos ordenados en " << temporal << endl;
+        return false;
+    }
+
     return true;
 }
