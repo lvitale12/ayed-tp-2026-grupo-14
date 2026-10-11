@@ -35,6 +35,8 @@ bool leerEntero(const char* mensaje, int& valor);
 bool buscarMozoPUP(FILE* archivo, int idMozo, Mozo& mozo);
 long busquedaBinaria(FILE* archivo, int codigo, Producto& producto);
 bool validarMozo(FILE* archivoMozos, int& idMozo);
+bool agregarComanda(const char* nombreArchivo, Comanda comanda);
+bool descontarStock(FILE* archivo, long posicion, Producto producto);
 bool cargarVenta(FILE* archivoMozos, FILE* archivoInventario, const char* nombreArchivo);
 
 int main() {
@@ -106,6 +108,8 @@ int main() {
         return 0;
     }
 
+    cout << "Se cargaron " << ventasCargadas << " ventas en "
+         << nombreArchivo << " (todavia sin ordenar)" << endl;
     return 0;
 }
 
@@ -202,8 +206,28 @@ bool validarMozo(FILE* archivoMozos, int& idMozo) {
     return true;
 }
 
-// Por ahora valido todo y calculo la comision, pero todavia no grabo nada.
-bool cargarVenta(FILE* archivoMozos, FILE* archivoInventario, const char*) {
+// Con "ab" agrego al final, y si la planilla del dia no existe la crea.
+bool agregarComanda(const char* nombreArchivo, Comanda comanda) {
+    FILE* archivo = fopen(nombreArchivo, "ab");
+
+    if (archivo == NULL) return false;
+
+    int escribio = fwrite(&comanda, sizeof(Comanda), 1, archivo);
+    fclose(archivo);
+    return escribio == 1;
+}
+
+// Edicion in situ: como la lectura (busquedaBinaria) me corrio el puntero,
+// tengo que volver a APUNTAR a la misma posicion antes de GRABAR.
+bool descontarStock(FILE* archivo, long posicion, Producto producto) {
+    fseek(archivo, posicion * (long)sizeof(Producto), SEEK_SET);
+    return fwrite(&producto, sizeof(Producto), 1, archivo) == 1;
+}
+
+// Devuelve true si la venta quedo registrada. Hago todas las validaciones ANTES de
+// escribir, asi una venta rechazada no modifica ningun archivo. Despues grabo
+// primero el stock y luego la comanda; si la comanda falla, restituyo el stock.
+bool cargarVenta(FILE* archivoMozos, FILE* archivoInventario, const char* nombreArchivo) {
     int idMozo = 0, codigo = 0, cantidad = 0;
     Producto producto;
 
@@ -232,9 +256,23 @@ bool cargarVenta(FILE* archivoMozos, FILE* archivoInventario, const char*) {
         return false;
     }
 
-    float comision = producto.precio * cantidad * TASA_COMISION;
+    Comanda comanda = {idMozo, codigo, cantidad, producto.precio * cantidad * TASA_COMISION};
+    Producto original = producto;               // me guardo una copia por si tengo que deshacer
+    producto.stockActual -= cantidad;
 
-    cout << "Venta valida: " << cantidad << " x " << producto.descripcion
-         << " | comision " << comision << " (todavia no se guarda)" << endl;
-    return false;
+    if (!descontarStock(archivoInventario, posicion, producto)) {
+        cout << "No se pudo actualizar el stock. Venta cancelada" << endl;
+        return false;
+    }
+
+    if (!agregarComanda(nombreArchivo, comanda)) {
+        descontarStock(archivoInventario, posicion, original);
+        cout << "No se pudo guardar la venta. Stock restituido" << endl;
+        return false;
+    }
+
+    cout << "Venta cargada: " << cantidad << " x " << producto.descripcion
+         << " | comision " << comanda.comision
+         << " | stock restante " << producto.stockActual << endl;
+    return true;
 }
