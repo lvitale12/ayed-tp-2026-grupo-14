@@ -6,24 +6,13 @@ unidad de **archivos binarios en C/C++**.
 > **Grupo:** 14
 >
 > **Integrantes:**
-> - [@lvitale12](https://github.com/lvitale12)
-> - [@mateo-gongora](https://github.com/magongora)
-> - [@TomasGenovesi](https://github.com/TomasGenovesi)
-> - [@lupe-erli](https://github.com/lupe-erli)
->
-> Los nombres completos y usuarios faltantes se revisarán antes de la entrega.
+> - Lorenzo Vitale — [@lvitale12](https://github.com/lvitale12)
+> - Mateo Agustin Gongora — [@magongora](https://github.com/magongora)
+> - Tomas Genovesi — [@TomasGenovesi](https://github.com/TomasGenovesi)
+> - Guadalupe Erli — [@lupe-erli](https://github.com/lupe-erli)
 
-La consigna completa está en **`enunciado.pdf`**. Leela antes de arrancar: el
-cliente (Alberto) cuenta su problema a su manera y ustedes tienen que descubrir
-cómo resolverlo con lo que vimos de archivos.
-
-## Organización del grupo
-
-- [Guía general: qué hay que construir y cómo funciona](docs/GUIA_TP.md)
-- [Plan de trabajo y reparto](docs/PLAN_DE_TRABAJO.md)
-- [Contrato común entre los cuatro programas](docs/CONTRATO_COMUN.md)
-- [Sugerencias para ramas, PR y commits](docs/FLUJO_GIT.md)
-- [Plan de pruebas](docs/PRUEBAS.md)
+La consigna completa está en **`enunciado.pdf`**. El proyecto implementa el
+circuito de normalización, carga de ventas, cierre semanal y resumen solicitado.
 
 ## Estructura del repo
 
@@ -36,17 +25,16 @@ cómo resolverlo con lo que vimos de archivos.
 │   └── dump_datos_de_prueba.txt   # los dos .dat en texto, para verificar la lectura
 ├── .gitignore
 │
-│   # --- estos los crean USTEDES (no vienen en el repo base) ---
 ├── normalizacion.cpp          # cada uno con su propio main; NO hay main.cpp
 ├── ventas.cpp
 ├── cierre.cpp
 └── resumen.cpp
 ```
 
-Los 4 programas los escriben ustedes desde cero: el repo base no trae código.
-Créenlos en la raíz del repo (como en el diagrama del enunciado).
+El repositorio contiene los cuatro programas en la raíz, cada uno con su propio
+`main`, como se indica en el diagrama del enunciado.
 
-## Cómo trabajar
+## Compilación y ejecución
 
 Los programas leen y escriben archivos `.dat` en la carpeta donde se ejecutan.
 Los archivos de `datos/` son los **originales** y no se modifican: copiálos a la
@@ -59,20 +47,55 @@ cp datos/comandas_historicas.dat datos/inventario.dat .
 Compilar y correr cada programa (cada uno tiene su propio `main`, no hay `main.cpp`):
 
 ```bash
-g++ -O2 -o normalizacion normalizacion.cpp
-g++ -O2 -o ventas        ventas.cpp
-g++ -O2 -o cierre        cierre.cpp
-g++ -O2 -o resumen       resumen.cpp
+g++ -std=c++17 -O2 -o normalizacion normalizacion.cpp
+g++ -std=c++17 -O2 -o ventas        ventas.cpp
+g++ -std=c++17 -O2 -o cierre        cierre.cpp
+g++ -std=c++17 -O2 -o resumen       resumen.cpp
 ```
 
 Orden de ejecución (cada programa deja los archivos que usa el siguiente):
 
 ```
 ./normalizacion     # historicas + inventario  ->  mozos.dat, comandas_dd-mm-aaaa.dat (varios), inventario actualizado
-./ventas            # carga interactiva de la semana  ->  agrega a las planillas del día
+./ventas            # carga ventas de una fecha       ->  agrega a la planilla del día
 ./cierre            # junta los días de la semana      ->  comandas_semana_sX-mm.dat
 ./resumen           # imprime el resumen por mozo + total del buffet
 ```
+
+Entradas interactivas:
+
+- `ventas` pide la fecha en formato `DD-MM-AAAA` y luego permite cargar ventas.
+- `cierre` pide el identificador semanal `sN-MM` (por ejemplo, `s1-06`) y el año.
+- `resumen` pide el nombre completo del archivo semanal generado por `cierre`.
+
+Para repetir el circuito desde cero hay que volver a copiar
+`datos/inventario.dat` a la raíz antes de ejecutar `normalizacion`, porque ese
+programa descuenta del inventario las comandas históricas.
+
+## Distribución del trabajo
+
+- **Normalización:** Lorenzo Vitale.
+- **Ventas:** Tomas Genovesi.
+- **Cierre semanal:** Guadalupe Erli.
+- **Resumen:** Mateo Agustin Gongora.
+- **Integración y pruebas:** trabajo grupal.
+
+## Decisiones de implementación
+
+- Los registros persistentes usan estructuras de tamaño fijo y campos `char[]`.
+- Los IDs de los mozos se asignan desde 1 según su primera aparición en el
+  histórico y quedan guardados en ese orden.
+- En `mozos.dat`, la clave inicial se guarda aplicando un corrimiento `K = 5` a
+  los caracteres del ID. Para ingresar en `ventas`, el mozo escribe su ID sin
+  transformar y el programa aplica el mismo corrimiento antes de comparar.
+- La fecha queda representada por el nombre del archivo diario; cada registro
+  diario contiene solamente la `Comanda` con el `idMozo`.
+- El inventario se busca por código mediante búsqueda binaria y se actualiza en
+  el mismo archivo.
+- Las comandas diarias se ordenan por `idMozo` para que cierre pueda aparearlas
+  y generar el archivo semanal.
+- El resumen semanal calcula las cantidades y comisiones directamente desde las
+  comandas agrupadas por `idMozo`.
 
 ## Verificar que leen bien el binario
 
@@ -81,16 +104,9 @@ en texto legible. Si tu programa imprime otra cosa al leerlos, revisá los `stru
 (orden de campos / tamaños): tienen que dar `sizeof(ComandaHistorica)=76` y
 `sizeof(Producto)=64`.
 
-## Qué se entrega
+## Contenido de la entrega
 
-- Este mismo repo (uno por grupo), con los **4 programas** `.cpp` en la raíz
-  (cada uno con su propio `main`, no hay `main.cpp`).
-- El **README** con el grupo, los integrantes (nombre + usuario de GitHub) y, si
-  hace falta, cualquier aclaración de cómo correrlo.
-- Los `.dat` de `datos/` son los **provistos por la cátedra** y ya vienen en el
-  repo: no los borren ni agreguen otros. Cualquier `.dat` que ustedes copien a la
-  raíz o generen al correr **no** se versiona (el `.gitignore` ya los deja afuera).
-  La cátedra corre sus programas sobre su propio dataset.
-- **Commits repartidos:** cada integrante tiene que tener commits propios a lo
-  largo del trabajo. El historial es parte de lo que se mira para la defensa
-  individual (no vale un único commit final ni que suba todo una sola persona).
+- Los cuatro programas `.cpp` están en la raíz y tienen su propio `main`.
+- Los archivos binarios de `datos/` son los originales provistos por la cátedra.
+- Los `.dat` generados durante la ejecución y los ejecutables quedan excluidos
+  mediante `.gitignore`.
