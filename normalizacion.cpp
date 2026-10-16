@@ -55,16 +55,18 @@ int cargarComandasNormalizadas(const char* nombreArchivo,
 void ordenarComandas(ComandaConFecha comandas[], int cantidadComandas);
 bool guardarComandasDiarias(ComandaConFecha comandas[],
                             int cantidadComandas);
+long buscarProducto(FILE* archivo, int codigo, Producto &producto);
+bool actualizarInventario(const char* nombreComandas,
+                          const char* nombreInventario);
 int cargarMozos(const char* nombreArchivo, Mozo mozos[]);
 bool guardarMozos(const char* nombreArchivo,
                   Mozo mozos[],
                   int cantidadMozos);
-int mostrarComandasHistoricas(const char* nombreArchivo);
-void mostrarInventario(const char* nombreArchivo);
+int contarComandasHistoricas(const char* nombreArchivo);
 
 int main() {
     int cantidadComandas =
-        mostrarComandasHistoricas("comandas_historicas.dat");
+        contarComandasHistoricas("comandas_historicas.dat");
 
     if (cantidadComandas == 0) {
         return 1;
@@ -102,15 +104,19 @@ int main() {
           return 1;
     }
 
+    if (!actualizarInventario("comandas_historicas.dat",
+                              "inventario.dat")) {
+        delete[] comandas;
+        delete[] mozos;
+        return 1;
+    }
+
     delete[] comandas;
     delete[] mozos;
-
-    cout << endl;
-    mostrarInventario("inventario.dat");
     return 0;
 }
 
-int mostrarComandasHistoricas(const char* nombreArchivo) {
+int contarComandasHistoricas(const char* nombreArchivo) {
     FILE* archivo = fopen(nombreArchivo, "rb");
 
     if (archivo == NULL) {
@@ -122,47 +128,98 @@ int mostrarComandasHistoricas(const char* nombreArchivo) {
     int cantidadRegistros = 0;
 
     while (fread(&comanda, sizeof(ComandaHistorica), 1, archivo) == 1) {
-        cout << comanda.fecha << " | "
-             << comanda.nombreMozo << " | producto "
-             << comanda.codigoProducto << " | cantidad "
-             << comanda.cantidad << " | comision "
-             << comanda.comision << endl;
-
         cantidadRegistros++;
     }
 
     fclose(archivo);
-
-    cout << "Total de comandas historicas: "
-         << cantidadRegistros << endl;
-
     return cantidadRegistros;
 }
 
-void mostrarInventario(const char* nombreArchivo) {
-    FILE* archivo = fopen(nombreArchivo, "rb");
+long buscarProducto(FILE* archivo, int codigo, Producto &producto) {
+    fseek(archivo, 0, SEEK_END);
+    long cantidadProductos = ftell(archivo) / sizeof(Producto);
+    long primero = 0;
+    long ultimo = cantidadProductos - 1;
 
-    if (archivo == NULL) {
-        cout << "No se pudo abrir " << nombreArchivo << endl;
-         return;
+    while (primero <= ultimo) {
+        long medio = (primero + ultimo) / 2;
+        fseek(archivo, medio * sizeof(Producto), SEEK_SET);
+
+        if (fread(&producto, sizeof(Producto), 1, archivo) != 1) {
+            return -1;
+        }
+
+        if (producto.codigo == codigo) {
+            return medio;
+        }
+
+        if (codigo > producto.codigo) {
+            primero = medio + 1;
+        } else {
+            ultimo = medio - 1;
+        }
     }
 
-    Producto producto;
-    int cantidadProductos = 0;
+    return -1;
+}
 
-    while (fread(&producto, sizeof(Producto), 1, archivo) == 1) {
-        cout << producto.codigo << " | "
-             << producto.descripcion << " | precio "
-             << producto.precio << " | stock "
-                 << producto.stockActual << endl;
+bool actualizarInventario(const char* nombreComandas,
+                          const char* nombreInventario) {
+    FILE* comandas = fopen(nombreComandas, "rb");
 
-        cantidadProductos++;
+    if (comandas == NULL) {
+        cout << "No se pudo abrir " << nombreComandas << endl;
+        return false;
     }
 
-    fclose(archivo);
+    FILE* inventario = fopen(nombreInventario, "rb+");
 
-    cout << "Total de productos: "
-         << cantidadProductos << endl;
+    if (inventario == NULL) {
+        cout << "No se pudo abrir " << nombreInventario << endl;
+        fclose(comandas);
+        return false;
+    }
+
+    ComandaHistorica comanda;
+
+    while (fread(&comanda,
+                 sizeof(ComandaHistorica),
+                 1,
+                 comandas) == 1) {
+        Producto producto;
+        long posicion = buscarProducto(
+            inventario,
+            comanda.codigoProducto,
+            producto
+        );
+
+        if (posicion == -1) {
+            cout << "No se encontro el producto "
+                 << comanda.codigoProducto << endl;
+            fclose(comandas);
+            fclose(inventario);
+            return false;
+        }
+
+        producto.stockActual -= comanda.cantidad;
+        fseek(inventario,
+              posicion * sizeof(Producto),
+              SEEK_SET);
+
+        if (fwrite(&producto,
+                   sizeof(Producto),
+                   1,
+                   inventario) != 1) {
+            cout << "No se pudo actualizar el inventario" << endl;
+            fclose(comandas);
+            fclose(inventario);
+            return false;
+        }
+    }
+
+    fclose(comandas);
+    fclose(inventario);
+    return true;
 }
 
 int buscarMozo(Mozo mozos[], int cantidadMozos, const char nombre[]) {
