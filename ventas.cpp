@@ -116,13 +116,23 @@ int main() {
     return 0;
 }
 
+// El formato es fijo (DD-MM-AAAA), asi que se en que posicion esta cada digito
+// y saco el dia, el mes y el anio directamente de los caracteres.
 bool fechaValida(const char fecha[]) {
     static const int dias[12] = {31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
-    int dia = 0, mes = 0, anio = 0;
 
-    return strlen(fecha) == 10 && fecha[2] == '-' && fecha[5] == '-' &&
-           sscanf(fecha, "%2d-%2d-%4d", &dia, &mes, &anio) == 3 &&
-           anio >= 2000 && mes >= 1 && mes <= 12 && dia >= 1 && dia <= dias[mes - 1];
+    if (strlen(fecha) != 10 || fecha[2] != '-' || fecha[5] != '-') return false;
+
+    for (int i = 0; i < 10; i++) {                  // todo lo que no es guion tiene que ser digito
+        if (i != 2 && i != 5 && (fecha[i] < '0' || fecha[i] > '9')) return false;
+    }
+
+    int dia = (fecha[0] - '0') * 10 + (fecha[1] - '0');
+    int mes = (fecha[3] - '0') * 10 + (fecha[4] - '0');
+    int anio = (fecha[6] - '0') * 1000 + (fecha[7] - '0') * 100 +
+               (fecha[8] - '0') * 10 + (fecha[9] - '0');
+
+    return anio >= 2000 && mes >= 1 && mes <= 12 && dia >= 1 && dia <= dias[mes - 1];
 }
 
 // Es la misma cuenta que hizo normalizacion.cpp: le sumo K a cada caracter.
